@@ -53,26 +53,46 @@ class Board():
 class Player():
     def __init__(self,checker_color):
         self.checker_color=checker_color
+    def __str__(self):
+        return f"{self.checker_color.value}"
 
 class Game():
     def __init__(self):
         self.board=None
         self.winner=None
+
+    def start(self):
+        self.get_board_size()
+        player1=Player(checker_white)
+        player2=Player(checker_black)
+        if(1==self.get_first_player()):
+            self.init(player1,player2)
+        else:
+            self.init(player2,player1)
+        print(self)
+
     def init(self,player1,player2):
         self.board=Board(self.board_size)
         self.current_player=player1
         self.player1=player1
         self.player2=player2
+
     def get_board_size(self):
-        self.board_size = int(input("Unesite dimenziju table: "))
-    
+        self.board_size = int(input("Board size: "))
+
+    def get_first_player(self):
+        print("Choose who goes first: ")
+        print("1.White")
+        print("2.Black")
+        return int(input())
+
+    def __str__(self):
+        return f"Player 1: {self.player1.checker_color.name}\n" \
+               f"Player 2: {self.player2.checker_color.name}\n\n" \
+               f"{self.board}"   
 def main():
     game = Game()
-    game.get_board_size()
-    game.init(None,None)
-    print(game.board)
-    player1=Player(checker_black)
-    player2=Player(checker_white)
-
+    game.start()
+    
 if __name__=="__main__":
     main()
