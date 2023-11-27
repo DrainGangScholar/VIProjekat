@@ -9,11 +9,11 @@ field_black=FieldColor.BLACK
 field_white=FieldColor.WHITE
 
 class CheckerColor(Enum):
-    BLACK="Black"
-    WHITE="White"
+    X="X"
+    O="O"
 
-checker_black=CheckerColor.BLACK
-checker_white=CheckerColor.WHITE
+checker_black=CheckerColor.X
+checker_white=CheckerColor.O
 
 class Field():
     def __init__(self,field_type,checker):
@@ -30,31 +30,69 @@ class Field():
         else:
             self.stack=[]
             return checker
-    # def add_stack(self,stack)->O
+
     def __str__(self):
-        #idx=len(self.stack)
-        #if idx>0:
-        #   return f"{self.stack[idx-1]}"
-        return f"{self.field_type.value}"
+        character='.' if self.field_type==field_black else ' '
+        matrix = [[character for _ in range(3)] for _ in range(3)]
+        for i, checker in enumerate(self.stack):
+            if i < 9:  
+                row, col = divmod(i, 3)
+                matrix[row][col] = checker.value
+        return "\n".join(''.join(row) for row in matrix) + "\n"
 
 
 class Board():
-    def __init__(self,num_of_fields):
-        self.num_of_fields=num_of_fields
-        self.fields=[[Field(field_black,"black" if row%2==0 else "white") if (row+col)%2==1 else Field(field_white," ") \
-                                                                        for col in range (num_of_fields)]       \
-                                                                        for row in range (num_of_fields)]
-    def __str__(self):
+    def __init__(self, num_of_fields):
+        self.num_of_fields = num_of_fields
+        self.fields = []
+
+        for row in range(num_of_fields):
+            row_fields = []
+            for col in range(num_of_fields):
+                is_black_field = (row + col) % 2 == 0
+                field = Field(field_black if is_black_field else field_white, None)
+
+                if is_black_field and 0 < row < num_of_fields - 1:
+                    checker = checker_black if row % 2 == 1 else checker_white
+                    field.stack.append(checker)
+
+                row_fields.append(field)
+            self.fields.append(row_fields)
+
+    def str(self):
         board_str = ""
         for row in self.fields:
-            board_str += ' '.join(str(field) for field in row) + "\n"
+            for _ in range(3):
+                board_str += ' '.join(field.__str__().split('\n')[_] for field in row) + "\n"
+        return board_str
+
+
+    def __str__(self):
+        column_labels = "  " + "   ".join(str(i + 1) for i in range(self.num_of_fields))
+        board_str = column_labels + "\n"
+
+        for i, row in enumerate(self.fields):
+            row_label = chr(65 + i)  
+            row_str_lines = ['' for _ in range(3)] 
+            for field in row:
+                field_lines = field.__str__().split('\n')
+                for j in range(3):
+                    row_str_lines[j] += field_lines[j] + " "
+
+            board_str += f"{row_label} " + "\n  ".join(row_str_lines) + "\n"
+
         return board_str
 
 class Player():
     def __init__(self,checker_color):
         self.checker_color=checker_color
+        self.score=0
+
+    def add_score(self, points):
+        self.score += points
+
     def __str__(self):
-        return f"{self.checker_color.value}"
+        return f"{self.checker_color.value} - Score: {self.score}"
 
 class Game():
     def __init__(self):
@@ -82,17 +120,20 @@ class Game():
 
     def get_first_player(self):
         print("Choose who goes first: ")
-        print("1.White")
-        print("2.Black")
+        print("1.O")
+        print("2.X")
         return int(input())
 
+#   def make_move(self,start_row,start_col,
+
     def __str__(self):
-        return f"Player 1: {self.player1.checker_color.name}\n" \
-               f"Player 2: {self.player2.checker_color.name}\n\n" \
-               f"{self.board}"   
+        return f"{self.board}\n" \
+               f"Player 1: {self.player1}\n" \
+               f"Player 2: {self.player2}\n\n" 
+
 def main():
     game = Game()
     game.start()
-    
+
 if __name__=="__main__":
     main()
