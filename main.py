@@ -124,7 +124,51 @@ class Game():
         print("2.X")
         return int(input())
 
-#   def make_move(self,start_row,start_col,
+ def input_move(self):
+        row = input("Enter row (A, B, C, ...): ").upper()
+        col = int(input("Enter column (1, 2, 3, ...): "))
+        stack_pos = int(input("Enter stack position (0, 1, 2, ...): "))
+        direction = input("Enter direction (GL, GD, DL, DD): ").upper()
+        return row, col, stack_pos, direction
+    
+ def is_valid_move(self, start_row, start_col, stack_pos, direction):
+        row_index = ord(start_row) - ord('A')
+        col_index = start_col - 1
+
+        if not (0 <= row_index < self.board.num_of_fields and 0 <= col_index < self.board.num_of_fields):
+            return False, "Move is outside the board boundaries."
+
+        if (row_index + col_index) % 2 != 0:
+            return False, "Can only move on dark squares."
+
+        start_field = self.board.fields[row_index][col_index]
+        if len(start_field.stack) == 0:
+            return False, "No stack to move."
+
+        if start_field.stack[0] != self.current_player.checker_color:
+            return False, "You do not own the bottom checker in the stack."
+
+        dir_offsets = {"GL": (-1, -1), "GD": (-1, 1), "DL": (1, -1), "DD": (1, 1)}
+        if direction not in dir_offsets:
+            return False, "Invalid direction."
+
+        delta_row, delta_col = dir_offsets[direction]
+        target_row_index = row_index + delta_row
+        target_col_index = col_index + delta_col
+
+        if not (0 <= target_row_index < self.board.num_of_fields and 0 <= target_col_index < self.board.num_of_fields):
+            return False, "Target position is outside the board boundaries."
+
+        if (target_row_index + target_col_index) % 2 != 0:
+            return False, "Can only move to dark squares."
+
+        target_field = self.board.fields[target_row_index][target_col_index]
+
+        if len(target_field.stack) > 0:  
+            if len(start_field.stack) - stack_pos + len(target_field.stack) >= 9:
+                return False, "Cannot form a stack of nine or more."
+
+        return True, "Valid move."
 
     def __str__(self):
         return f"{self.board}\n" \
