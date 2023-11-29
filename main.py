@@ -23,13 +23,18 @@ class Field():
             self.stack.append(checker)
 
     def add_checker(self,checker)->Optional[CheckerColor]:
-        length=len(stack)
+        length=len(self.stack)
         if length+1<8:
             self.stack.append(checker)
             return None
         else:
             self.stack=[]
             return checker
+
+    def empty(self)->bool:
+        if len(self.stack)>0:
+            return False
+        return True
 
     def __str__(self):
         character='.' if self.field_type==field_black else ' '
@@ -66,6 +71,11 @@ class Board():
                 board_str += ' '.join(field.__str__().split('\n')[_] for field in row) + "\n"
         return board_str
 
+    def empty(self):
+        for field in self.fields:
+            if not field.empty():
+                return False
+        return True
 
     def __str__(self):
         column_labels = "  " + "   ".join(str(i + 1) for i in range(self.num_of_fields))
@@ -124,14 +134,14 @@ class Game():
         print("2.X")
         return int(input())
 
- def input_move(self):
+    def input_move(self):
         row = input("Enter row (A, B, C, ...): ").upper()
         col = int(input("Enter column (1, 2, 3, ...): "))
         stack_pos = int(input("Enter stack position (0, 1, 2, ...): "))
         direction = input("Enter direction (GL, GD, DL, DD): ").upper()
         return row, col, stack_pos, direction
     
- def is_valid_move(self, start_row, start_col, stack_pos, direction):
+    def is_valid_move(self, start_row, start_col, stack_pos, direction):
         row_index = ord(start_row) - ord('A')
         col_index = start_col - 1
 
@@ -169,6 +179,28 @@ class Game():
                 return False, "Cannot form a stack of nine or more."
 
         return True, "Valid move."
+    
+    def won(self):
+        num_of_checkers=((self.board_size-2)*self.board_size/2)
+        max_score=num_of_checkers/8
+        win_score=(2*max_score)//3
+
+        if(self.player1.score>win_score):
+            self.winner=self.player1
+            return True
+
+        elif(self.player2.score>win_score):
+            self.winner=self.player2
+            return True
+
+        return False
+    
+    def is_over(self):
+        if self.board.empty():
+            return False, "Board is empty."
+        if not self.won():
+            return False, "No winner, yet."
+        return True, f"{self.winner} has won!"
 
     def __str__(self):
         return f"{self.board}\n" \
