@@ -64,13 +64,6 @@ class Board():
                 row_fields.append(field)
             self.fields.append(row_fields)
 
-    def str(self):
-        board_str = ""
-        for row in self.fields:
-            for _ in range(3):
-                board_str += ' '.join(field.__str__().split('\n')[_] for field in row) + "\n"
-        return board_str
-
     def empty(self):
         for field in self.fields:
             if not field.empty():
