@@ -31,7 +31,7 @@ class Field():
             self.stack=[]
             return checker
 
-    def empty(self)->bool:
+    def is_empty(self)->bool:
         if len(self.stack)>0:
             return False
         return True
@@ -65,9 +65,10 @@ class Board():
             self.fields.append(row_fields)
 
     def empty(self):
-        for field in self.fields:
-            if not field.empty():
-                return False
+        for row in self.fields:
+            for field in row:
+                if not field.is_empty():
+                    return False
         return True
 
     def __str__(self):
@@ -110,7 +111,6 @@ class Game():
             self.init(player1,player2)
         else:
             self.init(player2,player1)
-        print(self)
 
     def init(self,player1,player2):
         self.board=Board(self.board_size)
@@ -137,6 +137,7 @@ class Game():
     def is_valid_move(self, start_row, start_col, stack_pos, direction):
         row_index = ord(start_row) - ord('A')
         col_index = start_col - 1
+        start_field = self.board.fields[row_index][col_index]
 
         if not (0 <= row_index < self.board.num_of_fields and 0 <= col_index < self.board.num_of_fields):
             return False, "Move is outside the board boundaries."
@@ -170,6 +171,9 @@ class Game():
         if len(target_field.stack) > 0:  
             if len(start_field.stack) - stack_pos + len(target_field.stack) >= 9:
                 return False, "Cannot form a stack of nine or more."
+            
+        if start_field.stack[stack_pos] != self.current_player.checker_color:
+            return False, "It's not your turn."
 
         return True, "Valid move."
     
@@ -190,10 +194,44 @@ class Game():
     
     def is_over(self):
         if self.board.empty():
-            return False, "Board is empty."
+            return False
         if not self.won():
-            return False, "No winner, yet."
-        return True, f"{self.winner} has won!"
+            return False
+        return True
+
+    def switch_player(self):
+        self.current_player=self.player1 if self.current_player == self.player2 else self.player2
+
+    def get_move(self):
+        print(f"{self.current_player}'s turn:")
+        return self.input_move()
+    
+    def calculate_target_position(self, row_index, col_index, direction):
+        dir_offsets = {"GL": (-1, -1), "GD": (-1, 1), "DL": (1, -1), "DD": (1, 1)}
+        delta_row, delta_col = dir_offsets[direction]
+        return row_index + delta_row, col_index + delta_col
+
+    def move(self, row, col, stack_pos, direction):
+        row_index = ord(row) - ord('A')
+        col_index = col - 1
+        start_field = self.board.fields[row_index][col_index]
+
+        checker = start_field.stack.pop(stack_pos)
+        target_row_index, target_col_index = self.calculate_target_position(row_index, col_index, direction)
+
+        target_field = self.board.fields[target_row_index][target_col_index]
+        target_field.add_checker(checker)
+
+        #self.current_player.add_score(len(target_field.stack))
+
+    def execute_move(self,move):
+        row, col, stack_pos, direction = move
+        valid_move,message= self.is_valid_move(row, col, stack_pos, direction)
+        if valid_move:
+            self.move(row, col, stack_pos, direction)
+        else:
+            print(message)
+        return valid_move
 
     def __str__(self):
         return f"{self.board}\n" \
@@ -203,6 +241,23 @@ class Game():
 def main():
     game = Game()
     game.start()
+    while not game.is_over():
+        print(game)
+        move=game.get_move()
+        valid=game.execute_move(move)
+        while not valid:
+            move=game.get_move()
+            valid=game.execute_move(move)
+        game.switch_player()
+        # valid_move, error_message = execute_move(game, move)
 
+        # while not valid_move:
+        #     print(error_message)
+        #     move = current_player.get_move()
+        #     #valid_move, error_message = execute_move(game, move)
+    print(game)
+    if game.won():
+        print(f"{game.winner} has won!")
+    
 if __name__=="__main__":
     main()
