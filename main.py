@@ -1,3 +1,4 @@
+import copy
 from enum import Enum
 from queue import Queue
 from typing import Optional
@@ -404,6 +405,14 @@ class Game():
 
         return moves_from_field 
 
+    def copy_game(game):
+        new_game = Game()
+        new_game.board = copy.deepcopy(game.board)
+        new_game.current_player = copy.deepcopy(game.current_player)
+        new_game.player1 = copy.deepcopy(game.player1)
+        new_game.player2 = copy.deepcopy(game.player2)
+        new_game.winner = game.winner
+        return new_game
 
     def generate_all_moves(self):
         all_moves = []
@@ -419,7 +428,7 @@ class Game():
                         all_moves.extend(moves_from_field)
 
         return all_moves
-
+    
     def __str__(self):
         return f"{self.board}\n" \
                f"Player 1: {self.player1}\n" \
