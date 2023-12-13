@@ -1,0 +1,308 @@
+{
+  "board_size": 8,
+  "current_player": "O",
+  "player1_score": 0,
+  "player2_score": 0,
+  "board_fields": [
+    {
+      "type": "Black",
+      "stack": []
+    },
+    {
+      "type": "White",
+      "stack": []
+    },
+    {
+      "type": "Black",
+      "stack": []
+    },
+    {
+      "type": "White",
+      "stack": []
+    },
+    {
+      "type": "Black",
+      "stack": [
+        "X"
+      ]
+    },
+    {
+      "type": "White",
+      "stack": []
+    },
+    {
+      "type": "Black",
+      "stack": []
+    },
+    {
+      "type": "White",
+      "stack": []
+    },
+    {
+      "type": "White",
+      "stack": []
+    },
+    {
+      "type": "Black",
+      "stack": []
+    },
+    {
+      "type": "White",
+      "stack": []
+    },
+    {
+      "type": "Black",
+      "stack": []
+    },
+    {
+      "type": "White",
+      "stack": []
+    },
+    {
+      "type": "Black",
+      "stack": [
+        "X"
+      ]
+    },
+    {
+      "type": "White",
+      "stack": []
+    },
+    {
+      "type": "Black",
+      "stack": [
+        "X"
+      ]
+    },
+    {
+      "type": "Black",
+      "stack": [
+        "O",
+        "X"
+      ]
+    },
+    {
+      "type": "White",
+      "stack": []
+    },
+    {
+      "type": "Black",
+      "stack": []
+    },
+    {
+      "type": "White",
+      "stack": []
+    },
+    {
+      "type": "Black",
+      "stack": []
+    },
+    {
+      "type": "White",
+      "stack": []
+    },
+    {
+      "type": "Black",
+      "stack": [
+        "O"
+      ]
+    },
+    {
+      "type": "White",
+      "stack": []
+    },
+    {
+      "type": "White",
+      "stack": []
+    },
+    {
+      "type": "Black",
+      "stack": [
+        "X",
+        "O"
+      ]
+    },
+    {
+      "type": "White",
+      "stack": []
+    },
+    {
+      "type": "Black",
+      "stack": [
+        "X"
+      ]
+    },
+    {
+      "type": "White",
+      "stack": []
+    },
+    {
+      "type": "Black",
+      "stack": [
+        "X",
+        "O"
+      ]
+    },
+    {
+      "type": "White",
+      "stack": []
+    },
+    {
+      "type": "Black",
+      "stack": [
+        "X"
+      ]
+    },
+    {
+      "type": "Black",
+      "stack": [
+        "O"
+      ]
+    },
+    {
+      "type": "White",
+      "stack": []
+    },
+    {
+      "type": "Black",
+      "stack": [
+        "O"
+      ]
+    },
+    {
+      "type": "White",
+      "stack": []
+    },
+    {
+      "type": "Black",
+      "stack": [
+        "O"
+      ]
+    },
+    {
+      "type": "White",
+      "stack": []
+    },
+    {
+      "type": "Black",
+      "stack": [
+        "O"
+      ]
+    },
+    {
+      "type": "White",
+      "stack": []
+    },
+    {
+      "type": "White",
+      "stack": []
+    },
+    {
+      "type": "Black",
+      "stack": []
+    },
+    {
+      "type": "White",
+      "stack": []
+    },
+    {
+      "type": "Black",
+      "stack": [
+        "X"
+      ]
+    },
+    {
+      "type": "White",
+      "stack": []
+    },
+    {
+      "type": "Black",
+      "stack": [
+        "X"
+      ]
+    },
+    {
+      "type": "White",
+      "stack": []
+    },
+    {
+      "type": "Black",
+      "stack": [
+        "X"
+      ]
+    },
+    {
+      "type": "Black",
+      "stack": [
+        "O"
+      ]
+    },
+    {
+      "type": "White",
+      "stack": []
+    },
+    {
+      "type": "Black",
+      "stack": [
+        "O",
+        "X"
+      ]
+    },
+    {
+      "type": "White",
+      "stack": []
+    },
+    {
+      "type": "Black",
+      "stack": [
+        "O"
+      ]
+    },
+    {
+      "type": "White",
+      "stack": []
+    },
+    {
+      "type": "Black",
+      "stack": [
+        "O"
+      ]
+    },
+    {
+      "type": "White",
+      "stack": []
+    },
+    {
+      "type": "White",
+      "stack": []
+    },
+    {
+      "type": "Black",
+      "stack": []
+    },
+    {
+      "type": "White",
+      "stack": []
+    },
+    {
+      "type": "Black",
+      "stack": []
+    },
+    {
+      "type": "White",
+      "stack": []
+    },
+    {
+      "type": "Black",
+      "stack": []
+    },
+    {
+      "type": "White",
+      "stack": []
+    },
+    {
+      "type": "Black",
+      "stack": []
+    }
+  ]
+}
