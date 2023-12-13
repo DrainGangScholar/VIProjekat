@@ -146,6 +146,13 @@ class Game():
         direction = input("Enter direction (GL, GD, DL, DD): ").upper()
         return row, col, stack_pos, direction
     
+    def bounds_check_and_get_field(self, row, col):
+        length=self.board.num_of_fields
+        if 0 <= row < length and 0 <= col < length:
+            return self.board.fields[row][col]
+        else:
+            return None 
+    
     def bfs(self, start_row, start_col, directions):
         queue = Queue()
         visited = set()
@@ -199,7 +206,10 @@ class Game():
         delta_row, delta_col = dir_offsets[direction]
         target_row_index = row_index + delta_row
         target_col_index = col_index + delta_col
-        target_field = self.board.fields[target_row_index][target_col_index]
+        target_field = self.bounds_check_and_get_field(target_row_index,target_col_index)
+
+        if not target_field:
+            return False, "Out of bounds"
 
         if not (0 <= target_row_index < self.board.num_of_fields and 0 <= target_col_index < self.board.num_of_fields):
             return False, "Target position is outside the board boundaries."
@@ -230,10 +240,20 @@ class Game():
 
             temp=possible_moves.pop(direction)
 
+            # for _, (move_row, move_col) in possible_moves.items():
+            #     move_field = self.board.fields[row_index+move_row][col_index+move_col]
+            #     if not move_field.is_empty():
+            #         return False, "There is a non-empty, adjacent field."
+                
             for _, (move_row, move_col) in possible_moves.items():
-                move_field = self.board.fields[row_index+move_row][col_index+move_col]
-                if not move_field.is_empty():
-                    return False, "There is a non-empty, adjacent field."
+                new_row, new_col = row_index + move_row, col_index + move_col
+
+                if 0 <= new_row < self.board.num_of_fields and 0 <= new_col < self.board.num_of_fields:
+                    move_field = self.board.fields[new_row][new_col]
+                    if not move_field.is_empty():
+                        return False, "There is a non-empty, adjacent field."
+                else:
+                    return False, "Move is outside the board boundaries."
                 
             possible_moves[direction]=temp
 
@@ -373,6 +393,32 @@ class Game():
         with open(filename, "r") as json_file:
             data = json.load(json_file)
         return self.from_json(data)
+    
+    def generate_moves_from_field(self, row, col):
+        moves_from_field = []
+
+        for direction in ["GL", "GD", "DL", "DD"]:
+            valid_move, _ = self.is_valid_move(chr(65 + row), col + 1, 0, direction)
+            if valid_move:
+                moves_from_field.append((chr(65 + row), col + 1, 0, direction))
+
+        return moves_from_field 
+
+
+    def generate_all_moves(self):
+        all_moves = []
+
+        for row in range(self.board.num_of_fields):
+            for col in range(self.board.num_of_fields):
+                if self.board.fields[row][col].field_type==field_black:
+                    field=self.bounds_check_and_get_field(row,col)
+                    if not field:
+                       continue 
+                    if not field.is_empty() and field.stack[0] == self.current_player.checker_color:
+                        moves_from_field = self.generate_moves_from_field(row, col)
+                        all_moves.extend(moves_from_field)
+
+        return all_moves
 
     def __str__(self):
         return f"{self.board}\n" \
@@ -386,11 +432,9 @@ def main():
     while not game.is_over():
         # game.save_to_json("initial.json")
         print(game)
+        # print(game.generate_all_moves())
         move=game.get_move()
-        valid=game.execute_move(move)
-        while not valid:
-            move=game.get_move()
-            valid=game.execute_move(move)
+        game.execute_move(move)
         game.switch_player()
     # game.load_from_json("initial.json")
     print(game)
