@@ -197,7 +197,7 @@ class Game():
         if len(start_field.stack) == 0:
             return False, "No stack to move."
 
-        if start_field.stack[0] != self.current_player.checker_color and start_field.stack[stack_pos] != self.current_player.checker_color:
+        if start_field.stack[stack_pos] != self.current_player.checker_color:
             return False, "You do not own the checker you want to move."
 
         dir_offsets = {"GL": (-1, -1), "GD": (-1, 1), "DL": (1, -1), "DD": (1, 1)}
@@ -226,25 +226,23 @@ class Game():
             if len(target_field.stack) > 0:
                 if (
                     len(start_field.stack) > stack_pos
-                    and start_field.stack[stack_pos] == self.current_player.checker_color
                 ):
-                    resulting_stack_size = len(target_field.stack) + len(start_field.stack) - stack_pos
+                    if stack_pos > 0 and target_field.stack[-1] >= start_field.stack[stack_pos]:
+                        return False, "Invalid move: The moving checker must be on top of the stack."
+                    num_checkers_to_move = len(start_field.stack[stack_pos:])
+
+                    resulting_stack_size = len(target_field.stack) + num_checkers_to_move
 
                     if resulting_stack_size <= 8:
                         return True, "Valid move."
                     else:
-                        return False, "Cannot move the entire stack as it exceeds the maximum size."
+                        return False, "Cannot move the stack as it exceeds the maximum size."
                 else:
-                    return False, "Cannot move to a field with an existing stack."
+                    return False, "Index out of bounds."
         else:
             possible_moves = {"GL": (-1, -1), "GD": (-1, 1), "DL": (1, -1), "DD": (1, 1)}
 
             temp=possible_moves.pop(direction)
-
-            # for _, (move_row, move_col) in possible_moves.items():
-            #     move_field = self.board.fields[row_index+move_row][col_index+move_col]
-            #     if not move_field.is_empty():
-            #         return False, "There is a non-empty, adjacent field."
                 
             for _, (move_row, move_col) in possible_moves.items():
                 new_row, new_col = row_index + move_row, col_index + move_col
@@ -263,8 +261,6 @@ class Game():
             shortest_paths=sorted(all_paths,key=lambda x:len(x))
             
             shortest_path=shortest_paths[0]
-
-            print(shortest_path)
 
             paths = [path for path in shortest_paths if len(path) == len(shortest_path)]
 
@@ -312,6 +308,13 @@ class Game():
         dir_offsets = {"GL": (-1, -1), "GD": (-1, 1), "DL": (1, -1), "DD": (1, 1)}
         delta_row, delta_col = dir_offsets[direction]
         return row_index + delta_row, col_index + delta_col
+    
+    def add_point(self,last_checker):
+        if self.player0.checker==last_checker:
+            self.player0.score+=1
+            return
+        self.player1.score+=1 
+
 
     def move(self, row, col, stack_pos, direction):
         row_index = ord(row) - ord('A')
@@ -329,12 +332,6 @@ class Game():
         if exceeded:
             return True, last_checker
         return False,None
-
-    def add_point(self,last_checker):
-        if self.player1.checker==last_checker:
-            self.player1.score+=1
-            return
-        self.player2.score+=1 
 
     def execute_move(self,move):
         row, col, stack_pos, direction = move
@@ -398,21 +395,18 @@ class Game():
     def generate_moves_from_field(self, row, col):
         moves_from_field = []
 
-        for direction in ["GL", "GD", "DL", "DD"]:
-            valid_move, _ = self.is_valid_move(chr(65 + row), col + 1, 0, direction)
-            if valid_move:
-                moves_from_field.append((chr(65 + row), col + 1, 0, direction))
+        field = self.bounds_check_and_get_field(row, col)
+        if not field or field.is_empty():
+            return moves_from_field
 
-        return moves_from_field 
+        for stack_pos in range(len(field.stack)):
+            if field.stack[stack_pos] == self.current_player.checker_color:
+                for direction in ["GL", "GD", "DL", "DD"]:
+                    valid_move, _ = self.is_valid_move(chr(65 + row), col + 1, stack_pos, direction)
+                    if valid_move:
+                        moves_from_field.append((chr(65 + row), col + 1, stack_pos, direction))
 
-    def copy_game(game):
-        new_game = Game()
-        new_game.board = copy.deepcopy(game.board)
-        new_game.current_player = copy.deepcopy(game.current_player)
-        new_game.player1 = copy.deepcopy(game.player1)
-        new_game.player2 = copy.deepcopy(game.player2)
-        new_game.winner = game.winner
-        return new_game
+        return moves_from_field
 
     def generate_all_moves(self):
         all_moves = []
@@ -423,11 +417,19 @@ class Game():
                     field=self.bounds_check_and_get_field(row,col)
                     if not field:
                        continue 
-                    if not field.is_empty() and field.stack[0] == self.current_player.checker_color:
+                    if not field.is_empty() and self.current_player.checker_color in field.stack:
                         moves_from_field = self.generate_moves_from_field(row, col)
                         all_moves.extend(moves_from_field)
-
         return all_moves
+    
+    def copy_game(game):
+        new_game = Game()
+        new_game.board = copy.deepcopy(game.board)
+        new_game.current_player = copy.deepcopy(game.current_player)
+        new_game.player1 = copy.deepcopy(game.player1)
+        new_game.player2= copy.deepcopy(game.player2)
+        new_game.winner = game.winner
+        return new_game
     
     def __str__(self):
         return f"{self.board}\n" \
@@ -439,13 +441,10 @@ def main():
     game.start()
 
     while not game.is_over():
-        # game.save_to_json("initial.json")
         print(game)
-        # print(game.generate_all_moves())
         move=game.get_move()
         game.execute_move(move)
         game.switch_player()
-    # game.load_from_json("initial.json")
     print(game)
     if game.won():
         print(f"{game.winner} has won!")
