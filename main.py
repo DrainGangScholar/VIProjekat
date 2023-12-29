@@ -444,7 +444,7 @@ class Game():
         for move in moves:
             new_game = self.copy_game() 
             new_game.execute_move(move)
-            score, _ = new_game.min_max_alpha_beta(depth - 1, False, float('-inf'), float('inf'))
+            score, _ = new_game.min_max_alpha_beta(depth , False, float('-inf'), float('inf'))
 
             if score > best_score:
                 best_score = score
@@ -457,17 +457,6 @@ class Game():
         if self.current_player==self.player1:
             return self.player2
         return self.player1
-    
-    def get_num_stacks(self,color):
-        num=0
-        for row in range(self.board.num_of_fields):
-            for col in range(self.board.num_of_fields):
-                field = self.board.fields[row][col]
-                if field.field_type == field_black and not field.is_empty():
-                    bottom_piece_color = field.stack[0]
-                    if bottom_piece_color == color:
-                        num+=1
-        return num
     
     def get_counts_stack(self):
         color=self.current_player.checker_color
