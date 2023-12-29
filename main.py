@@ -34,7 +34,7 @@ class Field():
             self.stack=checker
         elif length+len(checker)==MAX_STACK_SIZE:
             self.stack=[]
-            return True,checker
+            return True,checker[-1]
         else:
             self.stack+=checker
         return False,None
@@ -319,12 +319,10 @@ class Game():
         return row_index + delta_row, col_index + delta_col
     
     def add_point(self,last_checker):
-        if self.current_player.checker_color==last_checker:
-            print(last_checker)
-            self.current_player.score+=1
-            return
-        other=self.get_other_player()
-        other.score+=1 
+        if self.player1.checker_color==last_checker:
+            self.player1.score+=1
+        else:
+            self.player2.score+=1
 
     def move(self, row, col, stack_pos, direction):
         row_index = ord(row) - ord('A')
